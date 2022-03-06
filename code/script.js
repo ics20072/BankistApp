@@ -78,7 +78,20 @@ const calcAndDisplayBalance = function (movementsArr) {
     return previousSum + curr;
   }, 0);
 
-  labelBalance.textContent = `${balance}₤`;
+  labelBalance.textContent = `${balance}€`;
+};
+
+const calcAndDisplaySummary = function (movementsArr) {
+  const income = movementsArr.filter((data) => data > 0).reduce((previousSum, curr) => previousSum + curr, 0);
+  labelSumIn.textContent = `${income}€`;
+  const charge = movementsArr.filter((data) => data < 0).reduce((previousSum, curr) => previousSum + curr, 0);
+  labelSumOut.textContent = `${Math.abs(charge)}€`;
+  const interest = movementsArr
+    .filter((data) => data > 0)
+    .map((data) => (data * 1.2) / 100)
+    .filter((interest) => interest >= 1) //To get the interest rate, it must be at least equal to 1 euros
+    .reduce((previousSum, curr) => previousSum + curr, 0);
+  labelSumInterest.textContent = `${interest}€`;
 };
 
 const generateUsernames = function (accountsArr) {
@@ -93,4 +106,5 @@ const generateUsernames = function (accountsArr) {
 
 displayMovements(account1.movements);
 calcAndDisplayBalance(account1.movements);
+calcAndDisplaySummary(account1.movements);
 generateUsernames(accounts);
