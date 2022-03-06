@@ -59,6 +59,8 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
+const transferMessage = document.querySelector(".transfer-message");
+
 const displayMovements = function (movementsArr) {
   containerMovements.innerHTML = ""; //clear the container before adding new movements
 
@@ -139,6 +141,12 @@ btnTransfer.addEventListener("click", function (evt) {
     loggedAccount.movements.push(-amount);
     receiverObj.movements.push(amount);
     updateUI(loggedAccount);
+    transferMessage.textContent = "";
+    transferMessage.classList.remove("hidden-balance");
+    setTimeout(() => {
+      transferMessage.textContent = `Successful transaction to ${receiverObj.owner.split(" ")[0]}✅`;
+      transferMessage.classList.add("hidden-balance");
+    }, 200);
   }
   inputTransferAmount.value = "";
   inputTransferTo.value = "";

@@ -100,6 +100,17 @@ nav {
   margin-bottom: 2rem;
 }
 
+.transfer-message {
+  font-size: 18px;
+  color: rgb(2, 90, 2);
+}
+
+.hidden-balance {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 3s, opacity 3s linear;
+}
+
 .balance__label {
   font-size: 2.2rem;
   font-weight: 500;
