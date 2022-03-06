@@ -1,5 +1,7 @@
 "use strict";
 
+let loggedAccount;
+
 // Data
 const account1 = {
   owner: "Jonas Schmedtmann",
@@ -73,22 +75,22 @@ const displayMovements = function (movementsArr) {
   }
 };
 
-const calcAndDisplayBalance = function (movementsArr) {
-  const balance = movementsArr.reduce(function (previousSum, curr) {
+const calcAndDisplayBalance = function (accountObj) {
+  accountObj.balance = accountObj.movements.reduce(function (previousSum, curr) {
     return previousSum + curr;
   }, 0);
 
-  labelBalance.textContent = `${balance}€`;
+  labelBalance.textContent = `${accountObj.balance}€`;
 };
 
-const calcAndDisplaySummary = function (movementsArr) {
-  const income = movementsArr.filter((data) => data > 0).reduce((previousSum, curr) => previousSum + curr, 0);
+const calcAndDisplaySummary = function (accountObj) {
+  const income = accountObj.movements.filter((data) => data > 0).reduce((previousSum, curr) => previousSum + curr, 0);
   labelSumIn.textContent = `${income}€`;
-  const charge = movementsArr.filter((data) => data < 0).reduce((previousSum, curr) => previousSum + curr, 0);
+  const charge = accountObj.movements.filter((data) => data < 0).reduce((previousSum, curr) => previousSum + curr, 0);
   labelSumOut.textContent = `${Math.abs(charge)}€`;
-  const interest = movementsArr
+  const interest = accountObj.movements
     .filter((data) => data > 0)
-    .map((data) => (data * 1.2) / 100)
+    .map((data) => (data * accountObj.interestRate) / 100)
     .filter((interest) => interest >= 1) //To get the interest rate, it must be at least equal to 1 euros
     .reduce((previousSum, curr) => previousSum + curr, 0);
   labelSumInterest.textContent = `${interest}€`;
@@ -104,7 +106,42 @@ const generateUsernames = function (accountsArr) {
   }
 };
 
-displayMovements(account1.movements);
-calcAndDisplayBalance(account1.movements);
-calcAndDisplaySummary(account1.movements);
+const updateUI = function (loggedAccount) {
+  displayMovements(loggedAccount.movements);
+  calcAndDisplayBalance(loggedAccount);
+  calcAndDisplaySummary(loggedAccount);
+};
+
+//Event Handlers
+btnLogin.addEventListener("click", function (evt) {
+  evt.preventDefault(); //prevent form from submitting and reloading
+  loggedAccount = accounts.find(function (accountObj) {
+    return accountObj.username === inputLoginUsername.value;
+  });
+
+  if (loggedAccount?.pin === Number(inputLoginPin.value)) {
+    labelWelcome.textContent = `Welcome Back ${loggedAccount.owner.split(" ")[0]}!`; //display only the owner name
+    containerApp.style.opacity = 100;
+    updateUI(loggedAccount);
+    inputLoginUsername.value = "";
+    inputLoginPin.value = "";
+    inputLoginPin.blur(); //field looses focus while logged in
+  } else {
+    console.log("no");
+  }
+});
+
+btnTransfer.addEventListener("click", function (evt) {
+  evt.preventDefault(); //prevent form from submitting and reloading
+  const amount = Number(inputTransferAmount.value);
+  const receiverObj = accounts.find((accountObj) => accountObj.username === inputTransferTo.value);
+  if (amount > 0 && loggedAccount.balance >= amount && receiverObj && receiverObj?.username !== loggedAccount.username) {
+    loggedAccount.movements.push(-amount);
+    receiverObj.movements.push(amount);
+    updateUI(loggedAccount);
+  }
+  inputTransferAmount.value = "";
+  inputTransferTo.value = "";
+});
+
 generateUsernames(accounts);
