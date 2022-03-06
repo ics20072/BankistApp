@@ -73,7 +73,13 @@ const displayMovements = function (movementsArr) {
   }
 };
 
-displayMovements(account1.movements);
+const calcAndDisplayBalance = function (movementsArr) {
+  const balance = movementsArr.reduce(function (previousSum, curr) {
+    return previousSum + curr;
+  }, 0);
+
+  labelBalance.textContent = `${balance}₤`;
+};
 
 const generateUsernames = function (accountsArr) {
   for (const account of accountsArr) {
@@ -85,4 +91,6 @@ const generateUsernames = function (accountsArr) {
   }
 };
 
+displayMovements(account1.movements);
+calcAndDisplayBalance(account1.movements);
 generateUsernames(accounts);
