@@ -218,6 +218,14 @@ nav {
   color: #333;
 }
 
+.error-transfer {
+  visibility: hidden;
+  text-align: center;
+  color: red;
+  font-size: 13px;
+  font-style: italic;
+}
+
 .operation--transfer {
   background-image: linear-gradient(to top left, #ffb003, #ffcb03);
 }

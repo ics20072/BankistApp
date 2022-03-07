@@ -60,6 +60,7 @@ const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
 const transferMessage = document.querySelector(".transfer-message");
+const transferError = document.querySelector(".error-transfer");
 
 const displayMovements = function (movementsArr) {
   containerMovements.innerHTML = ""; //clear the container before adding new movements
@@ -114,6 +115,12 @@ const updateUI = function (loggedAccount) {
   calcAndDisplaySummary(loggedAccount);
 };
 
+const resetInputStyle = function () {
+  inputTransferTo.style.color = "#333";
+  inputTransferAmount.style.color = "#333";
+  transferError.style.visibility = "hidden";
+};
+
 //Event Handlers
 btnLogin.addEventListener("click", function (evt) {
   evt.preventDefault(); //prevent form from submitting and reloading
@@ -137,19 +144,32 @@ btnTransfer.addEventListener("click", function (evt) {
   evt.preventDefault(); //prevent form from submitting and reloading
   const amount = Number(inputTransferAmount.value);
   const receiverObj = accounts.find((accountObj) => accountObj.username === inputTransferTo.value);
-  if (amount > 0 && loggedAccount.balance >= amount && receiverObj && receiverObj?.username !== loggedAccount.username) {
-    loggedAccount.movements.push(-amount);
-    receiverObj.movements.push(amount);
-    updateUI(loggedAccount);
-    transferMessage.textContent = "";
-    transferMessage.classList.remove("hidden-balance");
-    setTimeout(() => {
-      transferMessage.textContent = `Successful transaction to ${receiverObj.owner.split(" ")[0]}✅`;
-      transferMessage.classList.add("hidden-balance");
-    }, 200);
+  if (receiverObj && receiverObj?.username !== loggedAccount.username) {
+    if (amount > 0 && loggedAccount.balance >= amount) {
+      loggedAccount.movements.push(-amount);
+      receiverObj.movements.push(amount);
+      updateUI(loggedAccount);
+      transferMessage.textContent = "";
+      transferMessage.classList.remove("hidden-balance");
+      setTimeout(() => {
+        transferMessage.textContent = `Successful transaction to ${receiverObj.owner.split(" ")[0]}✅`;
+        transferMessage.classList.add("hidden-balance");
+      }, 200);
+      inputTransferAmount.value = "";
+      inputTransferTo.value = "";
+      resetInputStyle();
+    } else {
+      resetInputStyle();
+      transferError.textContent = "The amount transferred is incorrect!❌";
+      transferError.style.visibility = "visible";
+      inputTransferAmount.style.color = "red";
+    }
+  } else {
+    resetInputStyle();
+    transferError.textContent = "The bank account for transfer is incorrect!❌";
+    transferError.style.visibility = "visible";
+    inputTransferTo.style.color = "red";
   }
-  inputTransferAmount.value = "";
-  inputTransferTo.value = "";
 });
 
 generateUsernames(accounts);
