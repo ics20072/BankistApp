@@ -226,6 +226,14 @@ nav {
   font-style: italic;
 }
 
+.error-close-account {
+  visibility: hidden;
+  text-align: center;
+  color: white;
+  font-size: 13px;
+  font-style: italic;
+}
+
 .operation--transfer {
   background-image: linear-gradient(to top left, #ffb003, #ffcb03);
 }

@@ -61,6 +61,7 @@ const inputClosePin = document.querySelector(".form__input--pin");
 
 const transferMessage = document.querySelector(".transfer-message");
 const transferError = document.querySelector(".error-transfer");
+const closeAccountError = document.querySelector(".error-close-account");
 
 const displayMovements = function (movementsArr) {
   containerMovements.innerHTML = ""; //clear the container before adding new movements
@@ -115,10 +116,11 @@ const updateUI = function (loggedAccount) {
   calcAndDisplaySummary(loggedAccount);
 };
 
-const resetInputStyle = function () {
-  inputTransferTo.style.color = "#333";
-  inputTransferAmount.style.color = "#333";
-  transferError.style.visibility = "hidden";
+//Common functionallity for Transfers and Close Account messages
+const resetInputStyle = function (input1, input2, message) {
+  input1.style.color = "#333";
+  input2.style.color = "#333";
+  message.style.visibility = "hidden";
 };
 
 //Event Handlers
@@ -157,18 +159,44 @@ btnTransfer.addEventListener("click", function (evt) {
       }, 200);
       inputTransferAmount.value = "";
       inputTransferTo.value = "";
-      resetInputStyle();
+      resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
     } else {
-      resetInputStyle();
+      resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
       transferError.textContent = "The amount transferred is incorrect!❌";
       transferError.style.visibility = "visible";
       inputTransferAmount.style.color = "red";
     }
   } else {
-    resetInputStyle();
+    resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
     transferError.textContent = "The bank account for transfer is incorrect!❌";
     transferError.style.visibility = "visible";
     inputTransferTo.style.color = "red";
+  }
+});
+
+btnClose.addEventListener("click", function (evt) {
+  evt.preventDefault(); //prevent form from submitting and reloading
+  if (inputCloseUsername.value === loggedAccount.username) {
+    if (inputClosePin.value === String(loggedAccount.pin)) {
+      const index = accounts.findIndex(function (account) {
+        return account.username === loggedAccount.username;
+      });
+      accounts.splice(index, 1); //remove account
+      containerApp.style.opacity = 0; //Hide UI
+      inputCloseUsername.value = "";
+      inputClosePin.value = "";
+      resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+    } else {
+      resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+      closeAccountError.textContent = "Pin is incorrect❌";
+      closeAccountError.style.visibility = "visible";
+      inputClosePin.style.color = "red";
+    }
+  } else {
+    resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+    closeAccountError.textContent = "Username is incorrect❌";
+    closeAccountError.style.visibility = "visible";
+    inputCloseUsername.style.color = "red";
   }
 });
 
