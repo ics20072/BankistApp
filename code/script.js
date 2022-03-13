@@ -62,6 +62,7 @@ const inputClosePin = document.querySelector(".form__input--pin");
 const transferMessage = document.querySelector(".transfer-message");
 const transferError = document.querySelector(".error-transfer");
 const closeAccountError = document.querySelector(".error-close-account");
+const loanError = document.querySelector(".error-loan");
 
 const displayMovements = function (movementsArr) {
   containerMovements.innerHTML = ""; //clear the container before adding new movements
@@ -117,10 +118,19 @@ const updateUI = function (loggedAccount) {
 };
 
 //Common functionallity for Transfers and Close Account messages
-const resetInputStyle = function (input1, input2, message) {
-  input1.style.color = "#333";
-  input2.style.color = "#333";
+const resetInputStyle = function (message, ...inputFields) {
+  for (const input of inputFields) {
+    input.style.color = "#333";
+  }
   message.style.visibility = "hidden";
+};
+
+const transferMessageDisplay = function (message) {
+  transferMessage.classList.remove("hidden-balance");
+  setTimeout(() => {
+    transferMessage.textContent = message;
+    transferMessage.classList.add("hidden-balance");
+  }, 200);
 };
 
 //Event Handlers
@@ -152,22 +162,18 @@ btnTransfer.addEventListener("click", function (evt) {
       receiverObj.movements.push(amount);
       updateUI(loggedAccount);
       transferMessage.textContent = "";
-      transferMessage.classList.remove("hidden-balance");
-      setTimeout(() => {
-        transferMessage.textContent = `Successful transaction to ${receiverObj.owner.split(" ")[0]}✅`;
-        transferMessage.classList.add("hidden-balance");
-      }, 200);
+      transferMessageDisplay(`Successful transaction to ${receiverObj.owner.split(" ")[0]}✅`);
       inputTransferAmount.value = "";
       inputTransferTo.value = "";
-      resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
+      resetInputStyle(transferError, inputTransferTo, inputTransferAmount);
     } else {
-      resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
+      resetInputStyle(transferError, inputTransferTo, inputTransferAmount);
       transferError.textContent = "The amount transferred is incorrect!❌";
       transferError.style.visibility = "visible";
       inputTransferAmount.style.color = "red";
     }
   } else {
-    resetInputStyle(inputTransferTo, inputTransferAmount, transferError);
+    resetInputStyle(transferError, inputTransferTo, inputTransferAmount);
     transferError.textContent = "The bank account for transfer is incorrect!❌";
     transferError.style.visibility = "visible";
     inputTransferTo.style.color = "red";
@@ -185,18 +191,43 @@ btnClose.addEventListener("click", function (evt) {
       containerApp.style.opacity = 0; //Hide UI
       inputCloseUsername.value = "";
       inputClosePin.value = "";
-      resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+      resetInputStyle(closeAccountError, inputCloseUsername, inputClosePin);
     } else {
-      resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+      resetInputStyle(closeAccountError, inputCloseUsername, inputClosePin);
       closeAccountError.textContent = "Pin is incorrect❌";
       closeAccountError.style.visibility = "visible";
       inputClosePin.style.color = "red";
     }
   } else {
-    resetInputStyle(inputCloseUsername, inputClosePin, closeAccountError);
+    resetInputStyle(closeAccountError, inputCloseUsername, inputClosePin);
     closeAccountError.textContent = "Username is incorrect❌";
     closeAccountError.style.visibility = "visible";
     inputCloseUsername.style.color = "red";
+  }
+});
+
+btnLoan.addEventListener("click", function (evt) {
+  evt.preventDefault(); //prevent form from submitting and reloading
+  const amountRequested = Number(inputLoanAmount.value);
+  if (amountRequested > 0) {
+    if (loggedAccount.movements.some((mov) => mov >= amountRequested * 0.1)) {
+      loggedAccount.movements.push(amountRequested);
+      updateUI(loggedAccount);
+      inputLoanAmount.value = "";
+      transferMessage.textContent = "";
+      transferMessageDisplay(`Successful addition of a loan amount of ${amountRequested}€ ✅`);
+      resetInputStyle(loanError, inputLoanAmount);
+    } else {
+      resetInputStyle(loanError, inputLoanAmount);
+      loanError.textContent = "You have exceeded your acceptable limit!❌";
+      loanError.style.visibility = "visible";
+      inputLoanAmount.style.color = "red";
+    }
+  } else {
+    resetInputStyle(loanError, inputLoanAmount);
+    loanError.textContent = "Enter a positive number!❌";
+    loanError.style.visibility = "visible";
+    inputLoanAmount.style.color = "red";
   }
 });
 

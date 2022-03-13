@@ -218,7 +218,8 @@ nav {
   color: #333;
 }
 
-.error-transfer {
+.error-transfer,
+.error-loan {
   visibility: hidden;
   text-align: center;
   color: red;
