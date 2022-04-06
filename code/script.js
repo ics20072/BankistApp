@@ -1,6 +1,7 @@
 "use strict";
 
 let loggedAccount;
+let notSorted = true; //to sort movements or not
 
 // Data
 const account1 = {
@@ -64,10 +65,12 @@ const transferError = document.querySelector(".error-transfer");
 const closeAccountError = document.querySelector(".error-close-account");
 const loanError = document.querySelector(".error-loan");
 
-const displayMovements = function (movementsArr) {
+const displayMovements = function (movementsArr, sort = false) {
   containerMovements.innerHTML = ""; //clear the container before adding new movements
 
-  for (const [index, movement] of movementsArr.entries()) {
+  const moves = sort ? movementsArr.slice().sort((curr, next) => curr - next) : movementsArr;
+
+  for (const [index, movement] of moves.entries()) {
     const movementType = movement > 0 ? "deposit" : "withdrawal";
 
     const html = `<div class="movements__row">
@@ -229,6 +232,12 @@ btnLoan.addEventListener("click", function (evt) {
     loanError.style.visibility = "visible";
     inputLoanAmount.style.color = "red";
   }
+});
+
+btnSort.addEventListener("click", function (evt) {
+  evt.preventDefault();
+  displayMovements(loggedAccount.movements, notSorted);
+  notSorted = !notSorted;
 });
 
 generateUsernames(accounts);
